@@ -1,7 +1,7 @@
 
-import vk
+import vk_help
 import db
-import vk_api, json
+import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from random import randrange
@@ -42,7 +42,7 @@ def search_criteria():
                     write_msg(event.user_id, '3) Введите пол:', my_keyboard=keyboard_sex)
                     for event_sex in longpoll.listen():
                         if event_sex.type == VkEventType.MESSAGE_NEW and event_sex.to_me:
-                            sex = event_sex.text
+                            sex = 2 if event_sex.text == 'мужской' else 1
                             write_msg(event.user_id, '4) Город:')
                             for event_city in longpoll.listen():
                                 if event_city.type == VkEventType.MESSAGE_NEW and event_city.to_me:
@@ -50,6 +50,12 @@ def search_criteria():
                                     criteria_data = {'min_age': min_age, 'max_age': max_age, 'sex': sex, 'city': city}
                                     return criteria_data
 
+def suggest_person(user_id, message, my_keyboard=keyboard):
+    vk_bot.method('messages.send', {'user_id': user_id,
+                                    'message': message,
+                                    'random_id': randrange(10 ** 7),
+                                    'attacment': vk_help.vk.take_photo(user_id)[0],
+                                    'keyboard': my_keyboard.get_keyboard()})
 
 
 for event in longpoll.listen():
@@ -61,8 +67,8 @@ for event in longpoll.listen():
                 write_msg(event.user_id, f"Хай, {event.user_id}! "
                                          f"Приветствую тебя в Vkinder! Давайте определим критерии выбора, нажав на кнопку <Установить критерии поиска>") #Поменять id на имя
             elif request == 'Установить критерии поиска':
-                search_criteria()
-
+                # search_criteria()
+                suggest_person(event.user_id, vk_help.vk.person_info(search_criteria()))
 
             else:
                 write_msg(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")

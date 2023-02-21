@@ -20,7 +20,7 @@ def search(criteria):
     for result in searched:
         if result['is_closed'] == False:
             offer.append({'id': result['id'], 'first_name': result['first_name'], 'last_name': result['last_name'],
-                          'sex': result['sex'], 'can_write':result['can_write_private_message'], 'href': f'vk.com/id{result["id"]}',
+                          'sex': result['sex'], 'can_write':result['can_write_private_message'], 'href': f'vk_help.com/id{result["id"]}',
                           })
     return offer
 
