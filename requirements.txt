@@ -1,3 +1,9 @@
 requests
+<<<<<<< HEAD
 pytest
 vk_api
+=======
+vk_api
+pytest
+
+>>>>>>> d005777d312fba492ffa909e0bf53b655a0599b3
