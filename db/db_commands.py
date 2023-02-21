@@ -19,4 +19,3 @@ async def add_user(user_id: int, first_name: str, last_name: str, city: str, age
 async def select_user(user_id):
     user = await User.query.where(User.user_id == user_id).gino.first()
     return user
-
