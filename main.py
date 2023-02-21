@@ -1,6 +1,7 @@
 import vk
 import db
-import vk_api, json
+import vk_api
+import json
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from random import randrange
@@ -19,11 +20,13 @@ keyboard.add_button('Список избранных', color=VkKeyboardColor.PRI
 keyboard.add_line()
 keyboard.add_button('Установить критерии поиска', color=VkKeyboardColor.SECONDARY)
 
+
 def write_msg(user_id, message, my_keyboard=keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
                                 'message': message,
                                 'random_id': randrange(10 ** 7),
                                 'keyboard': my_keyboard.get_keyboard()})
+
 
 def search_criteria():
     write_msg(event.user_id, '1) Введите минимальный возраст:')
@@ -50,9 +53,6 @@ def search_criteria():
                                     return criteria_data
 
 
-
-
-
 for event in longpoll.listen():
     if event.type == VkEventType.MESSAGE_NEW:
 
@@ -60,10 +60,10 @@ for event in longpoll.listen():
             request = event.text
             if request.lower() == 'да':
                 write_msg(event.user_id, f"Хай, {event.user_id}! "
-                                         f"Приветствую тебя в Vkinder! Давайте определим критерии выбора, нажав на кнопку <Установить критерии поиска>") #Поменять id на имя
+                                         f"Приветствую тебя в Vkinder! Давайте определим критерии выбора,"
+                                         f"нажав на кнопку <Установить критерии поиска>")  #Поменять id на имя
             elif request == 'Установить критерии поиска':
                 search_criteria()
-
 
             else:
                 write_msg(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")
