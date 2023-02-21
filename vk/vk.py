@@ -3,7 +3,7 @@ import random
 from heapq import nlargest
 from tokens import token_vk, token_bot
 
-# criteria_data = {'min_age': 15, 'max_age': 20, 'sex': 2, 'city': 'Москва'}
+criteria_data = {'min_age': 15, 'max_age': 20, 'sex': 2, 'city': '1'}
 def search_people(criteria):
     URL_search_people = 'https://api.vk.com/method/users.search'
     params_search_people = {
@@ -14,7 +14,7 @@ def search_people(criteria):
         'age_to': criteria['max_age'],
         'has_photo':'1',
         'is_closed': 'False',
-        # 'city': criteria['city'], #Не понимаю, как работать с идентификатором города
+        'city': criteria['city'],
         "v": "5.131"
     }
     response_search_people = requests.get(URL_search_people, params=params_search_people)
