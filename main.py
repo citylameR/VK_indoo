@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> d005777d312fba492ffa909e0bf53b655a0599b3
 import vk
 import db
 import vk_api, json
@@ -68,9 +64,4 @@ for event in longpoll.listen():
 
 
             else:
-<<<<<<< HEAD
                 write_msg(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")
-=======
-                write_msg(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")
-
->>>>>>> d005777d312fba492ffa909e0bf53b655a0599b3
