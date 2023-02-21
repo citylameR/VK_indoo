@@ -1,3 +1,4 @@
+
 import vk
 import db
 import vk_api, json
@@ -51,8 +52,6 @@ def search_criteria():
 
 
 
-
-
 for event in longpoll.listen():
     if event.type == VkEventType.MESSAGE_NEW:
 
@@ -67,3 +66,4 @@ for event in longpoll.listen():
 
             else:
                 write_msg(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")
+

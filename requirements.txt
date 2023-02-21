@@ -1,2 +1,4 @@
 requests
 vk_api
+pytest
+
