@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, String, sql, ForeignKey, Integer
+from sqlalchemy import Column, BigInteger, String, sql, ForeignKey
 import asyncio
 
 from data import config
