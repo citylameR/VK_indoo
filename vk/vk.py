@@ -1,8 +1,9 @@
 import requests
-from vk import search
+# from vk import search
 import random
 from heapq import nlargest
 from tokens import token_vk
+from pprint import pprint
 
 criteria_data = {'min_age': 15, 'max_age': 20, 'sex': 2, 'city': '1'}
 
@@ -39,15 +40,20 @@ def take_photo(user_id):
         "extended": "1",
     }
     response_id_photo = requests.get(URL_id_photo, params=params_id_photo)
-    data_id_photo = response_id_photo.json()["response"]["items"]
+    data_id_photo = response_id_photo.json()["response"]
     max_likes = []
     data_top_photo = []
-    for photo in data_id_photo:
-        max_likes.append(photo["likes"]["count"])
-    for photo in data_id_photo:
-        if photo["likes"]["count"] in nlargest(3, max_likes):
+    if data_id_photo['count']>=3:
+        for photo in data_id_photo['items']:
+            max_likes.append(photo["likes"]["count"])
+        for photo in data_id_photo['items']:
+            if photo["likes"]["count"] in nlargest(3, max_likes):
+                data_top_photo.append(photo["sizes"][-1]["url"])
+        return data_top_photo
+    else:
+        for photo in data_id_photo['items']:
             data_top_photo.append(photo["sizes"][-1]["url"])
-    return data_top_photo
+        return data_top_photo
 
 
 # def take_user_info(user_id):

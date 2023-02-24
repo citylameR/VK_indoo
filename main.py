@@ -6,11 +6,15 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from random import randrange
 from tokens import token_bot
+from data import config
+from db.dp_gino import db
+import asyncio
+from db import db_commands
+from pprint import pprint
 
 
 vk_bot = vk_api.VkApi(token=token_bot)
 longpoll = VkLongPoll(vk_bot)
-
 keyboard = VkKeyboard(one_time=False)
 keyboard.add_button('В избранное', color=VkKeyboardColor.POSITIVE)
 keyboard.add_button('Следующий', color=VkKeyboardColor.POSITIVE)
@@ -67,3 +71,15 @@ for event in longpoll.listen():
 
             else:
                 write_msg(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")
+
+
+async def on_start_up():
+    await db.set_bind(config.POSTGRES_URI)
+    await db.gino.drop_all()
+    await db.gino.create_all()
+    await db_commands.add_user(user_id=28964076, first_name="Igor", last_name="Ter-pogosyan", city="Saint-P", age=22,
+                               age_min=20, age_max=25, sex="Мужской")
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(on_start_up())
