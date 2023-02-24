@@ -1,5 +1,5 @@
 import requests
-import search
+from vk import search
 import random
 from heapq import nlargest
 from tokens import token_vk
