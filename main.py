@@ -1,31 +1,16 @@
-import vk
-import db
 import vk_api
-import json
 from vk_api.longpoll import VkLongPoll, VkEventType
-from vk_api.keyboard import VkKeyboard, VkKeyboardColor
-from random import randrange
-from tokens import token_bot
 from data import config
+import bot.keyboards as keys
+from random import randrange
 from db.dp_gino import db
 import asyncio
 from db import db_commands
+import db
 from pprint import pprint
+from vk import vk as vkfunc
 
-
-vk_bot = vk_api.VkApi(token=token_bot)
-longpoll = VkLongPoll(vk_bot)
-keyboard = VkKeyboard(one_time=False)
-keyboard.add_button('В избранное', color=VkKeyboardColor.POSITIVE)
-keyboard.add_button('Следующий', color=VkKeyboardColor.POSITIVE)
-keyboard.add_line()
-keyboard.add_button('В черный список', color=VkKeyboardColor.NEGATIVE)
-keyboard.add_button('Список избранных', color=VkKeyboardColor.PRIMARY)
-keyboard.add_line()
-keyboard.add_button('Установить критерии поиска', color=VkKeyboardColor.SECONDARY)
-
-
-def write_msg(user_id, message, my_keyboard=keyboard):
+def write_msg(user_id, message, my_keyboard=keys.p_keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
                                 'message': message,
                                 'random_id': randrange(10 ** 7),
@@ -42,10 +27,7 @@ def search_criteria():
             for event_max_age in longpoll.listen():
                 if event_max_age.type == VkEventType.MESSAGE_NEW and event_max_age.to_me:
                     max_age = event_max_age.text
-                    keyboard_sex = VkKeyboard(one_time=False)
-                    keyboard_sex.add_button('мужской', color=VkKeyboardColor.POSITIVE)
-                    keyboard_sex.add_button('женский', color=VkKeyboardColor.NEGATIVE)
-                    write_msg(event.user_id, '3) Введите пол:', my_keyboard=keyboard_sex)
+                    write_msg(event.user_id, '3) Введите пол:', my_keyboard=keys.keyboard_sex)
                     for event_sex in longpoll.listen():
                         if event_sex.type == VkEventType.MESSAGE_NEW and event_sex.to_me:
                             sex = event_sex.text
@@ -57,29 +39,30 @@ def search_criteria():
                                     return criteria_data
 
 
+if __name__ == "__main__":
+    vk_bot = vk_api.VkApi(token=config.token_bot)
+    longpoll = VkLongPoll(vk_bot)
+    print("Bot started succesfully")
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(db.dp_gino.on_startup())
+    print("Connected to database successfully")
+
+
 for event in longpoll.listen():
     if event.type == VkEventType.MESSAGE_NEW:
-
         if event.to_me:
             request = event.text
-            if request.lower() == 'да':
-                write_msg(event.user_id, f"Хай, {event.user_id}! "
+            if request.lower() == 'отсутствует':
+                info = (vkfunc.take_user_info(event.user_id))
+                pprint(info)
+                write_msg(event.user_id, f"Хай, {info['first_name']}!"
                                          f"Приветствую тебя в Vkinder! Давайте определим критерии выбора,"
-                                         f"нажав на кнопку <Установить критерии поиска>")  #Поменять id на имя
+                                         f"нажав на кнопку <Установить критерии поиска>")
+                loop.run_until_complete(db_commands.add_user(user_id=event.user_id, first_name=info['first_name'],
+                                                             last_name=info['last_name'], city=str(info['city']), age=22,
+                                                             age_min=20, age_max=25, sex=str(info['sex'])))
             elif request == 'Установить критерии поиска':
                 search_criteria()
 
             else:
                 write_msg(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")
-
-
-async def on_start_up():
-    await db.set_bind(config.POSTGRES_URI)
-    await db.gino.drop_all()
-    await db.gino.create_all()
-    await db_commands.add_user(user_id=28964076, first_name="Igor", last_name="Ter-pogosyan", city="Saint-P", age=22,
-                               age_min=20, age_max=25, sex="Мужской")
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(on_start_up())

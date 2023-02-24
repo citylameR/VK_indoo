@@ -56,33 +56,21 @@ def take_photo(user_id):
         return data_top_photo
 
 
-# def take_user_info(user_id):
-#     URL_id_info = "https://api.vk.com/method/users.get"
-#     params_id_info = {
-#         "access_token": token_vk,
-#         "user_ids": user_id,
-#         "fields": "city, sex",
-#         "name_case": "nom",
-#         "v": "5.131",
-#     }
-#     response_id_info = requests.get(URL_id_info, params=params_id_info)
-#     data_id_info = response_id_info.json()["response"]
-#     for data in data_id_info:
-#         first_name = data["first_name"]
-#         last_name = data["last_name"]
-#         city = data["city"]["title"]  # Реализовать, если нет города
-#         sex = (
-#             "мужской" if data["sex"] == 2 else "женский"
-#         )  # Реализовать, если нет секса
-#         data_info = {
-#             "first_name": first_name,
-#             "last_name": last_name,
-#             "city": city,
-#             "sex": sex,
-#             "photo": take_photo(user_id),
-#         }
-#
-#         return data_info
+def take_user_info(user_id):
+    URL_id_info = "https://api.vk.com/method/users.get"
+    params_id_info = {
+        "access_token": token_vk,
+        "user_ids": user_id,
+        "fields": "city, sex, bdate",
+        "name_case": "nom",
+        "v": "5.131",
+    }
+    response_id_info = requests.get(URL_id_info, params=params_id_info)
+    data_id_info = response_id_info.json()["response"][0]
+    info = {"first_name": data_id_info['first_name'], "last_name": data_id_info['last_name'], "sex": data_id_info['sex'],
+            "city": data_id_info['city']['id']}
+    return info
+
 
 def person_info(people_data):
     person = random.choice(people_data)
@@ -93,7 +81,3 @@ def person_info(people_data):
                   'sex': person['sex'],
                   'photo': take_photo(person['id'])}
     return to_message
-
-# criteria_data = {'min_age': 15, 'max_age': 20, 'sex': 2, 'city': 1}
-#
-# print(person_info(search.search(criteria_data)))
