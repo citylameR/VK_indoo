@@ -4,9 +4,6 @@ from heapq import nlargest
 from tokens import token_vk
 from pprint import pprint
 
-criteria_data = {'min_age': 15, 'max_age': 20, 'sex': 2, 'city': '1'}
-
-
 def search_people(criteria):
     URL_search_people = 'https://api.vk.com/method/users.search'
     params_search_people = {
@@ -76,7 +73,19 @@ def person_info(people_data):
     to_message = {'first_name': person['first_name'],
                   'last_name': person['last_name'],
                   'link': person['href'],
-                  # 'city': person['city'],
+                  'city': person['city'],
                   'sex': person['sex'],
                   'photo': take_photo(person['id'])}
     return to_message
+
+def get_city_index(city: str):
+    url = 'https://api.vk.com/method/database.getCities'
+    params = {
+        "access_token": token_vk,
+        "v": "5.131",
+        "q": city,
+        "count": "1"
+    }
+    response = requests.get(url, params=params)
+    index = response.json()['response']['items'][0]
+    return index
