@@ -1,5 +1,4 @@
 import requests
-from vk import search
 import random
 from heapq import nlargest
 from tokens import token_vk
@@ -45,7 +44,7 @@ def take_photo(user_id):
     for photo in data_id_photo:
         max_likes.append(photo["likes"]["count"])
     for photo in data_id_photo:
-        if photo["likes"]["count"] in nlargest(3, max_likes):
+        if photo["likes"]["count"] in nlargest(3, max_likes): #Добавить проверку на фотографии
             data_top_photo.append(photo["sizes"][-1]["url"])
     return data_top_photo
 

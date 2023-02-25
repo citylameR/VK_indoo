@@ -2,7 +2,8 @@
 import vk_help
 import db
 import vk_api
-import vk
+from vk import vk
+import json
 
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
@@ -33,7 +34,7 @@ def write_msg(user_id, message, my_keyboard=keyboard):
 def search_criteria():
     write_msg(event.user_id, '1) Введите минимальный возраст:')
     for event_min_age in longpoll.listen():
-        if event_min_age.type == VkEventType.MESSAGE_NEW and event_min_age.to_me:
+        if event_min_age.type == VkEventType.MESSAGE_NEW and event_min_age.to_me: # Сделать проверку на интегер
             min_age = event_min_age.text
             write_msg(event_min_age.user_id, 'Успешно')
             write_msg(event.user_id, '2) Введите максимальный возраст:')
@@ -51,8 +52,13 @@ def search_criteria():
                             for event_city in longpoll.listen():
                                 if event_city.type == VkEventType.MESSAGE_NEW and event_city.to_me:
                                     city = event_city.text
-                                    criteria_data = {'min_age': min_age, 'max_age': max_age, 'sex': sex, 'city': city}
+                                    with open('criteria_file', 'w', encoding='UTF-8') as file:
+                                        criteria_data = {'min_age': min_age, 'max_age': max_age, 'sex': sex, 'city': city}
+                                        json.dump(criteria_data, file)
+
                                     return criteria_data
+
+
 
 def suggest_person(user_id, message, my_keyboard=keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
@@ -71,12 +77,11 @@ for event in longpoll.listen():
                                          f"Приветствую тебя в Vkinder! Давайте определим критерии выбора,"
                                          f"нажав на кнопку <Установить критерии поиска>")  #Поменять id на имя
             elif request == 'Установить критерии поиска':
-<<<<<<< HEAD
-                # search_criteria()
                 suggest_person(event.user_id, vk_help.vk.person_info(search_criteria()))
-=======
-                search_criteria()
->>>>>>> 7d5cc440eff5d59dd2b46a7d9f9315ee5d27a0c7
 
+            elif request == 'Следующий':
+                with open('criteria_file', 'r', encoding='UTF-8') as file:
+                    data_criteria = json.load(file)
+                    suggest_person(event.user_id, vk_help.vk.person_info(data_criteria))
             else:
                 write_msg(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")
