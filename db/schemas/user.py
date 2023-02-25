@@ -1,8 +1,9 @@
-from sqlalchemy import Column, BigInteger, String, sql, ForeignKey, Integer
+from sqlalchemy import Column, BigInteger, String, sql, ForeignKey
 import asyncio
 
 from data import config
 from db.dp_gino import TimedBaseModel, db
+
 
 
 
@@ -13,23 +14,13 @@ class User(TimedBaseModel):
     user_id = Column(BigInteger, primary_key=True)
     first_name = Column(String(200))
     last_name = Column(String(200))
-    city = Column(String(200))
+    city = Column(BigInteger)
     age = Column(BigInteger)
     age_min = Column(BigInteger)
     age_max = Column(BigInteger)
     sex = Column(String(30))
 
     query: sql.select
-
-class Favorites(TimedBaseModel):
-
-    __tablename__ = 'favorites'
-
-    favorite_id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey('users.user_id'))
-
-    query: sql.select
-
 
 class Black_list(TimedBaseModel):
 
@@ -42,31 +33,36 @@ class Black_list(TimedBaseModel):
 query: sql.select
 
 
-class Photo(TimedBaseModel):
+class Favorites(TimedBaseModel):
 
-    __tablename__ = 'photo'
+    __tablename__ = 'favorites'
 
+    favorite_id = Column(BigInteger, primary_key=True)
+    url = Column(String, nullable = False)
 
-    user_id = Column(BigInteger, primary_key=True)
-    photo_id = Column(String, primary_key=True)
 
     query: sql.select
 
-# class Offer(TimedBaseModel):
-#
-#     __tablename__ = 'offer'
-#
-#     offer_id = Column(BigInteger, primary_key=True)
-#     user_id = Column(BigInteger, ForeignKey('users.user_id'))
-#     photo_id = Column(String, ForeignKey('photo.photo_id'))
+
+class Favorite_person(TimedBaseModel):
+
+    __tablename__ = 'favorite_person'
+
+    user_id = Column(BigInteger, ForeignKey('users.user_id'))
+    favorites_id = Column(BigInteger, ForeignKey('favorites.favorite_id'))
+    pk = db.PrimaryKeyConstraint('user_id', 'favorites_id', name='favorite_pk')
 
     query: sql.select
 
-async def on_start_up():
-    await db.set_bind(config.POSTGRES_URI)
-    await db.gino.drop_all()
-    await db.gino.create_all()
+    def __str__(self):
+        return f'{self.favorites_id}'
 
+class Offer(TimedBaseModel):
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(on_start_up())
+    __tablename__ = 'offer'
+
+    offer_id = Column(BigInteger, primary_key=True)
+    user_id = Column(BigInteger, ForeignKey('users.user_id'))
+
+    query: sql.select
+
