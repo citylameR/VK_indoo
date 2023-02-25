@@ -1,4 +1,3 @@
-
 from vk import vk
 import json
 import vk_api
@@ -8,23 +7,22 @@ import bot.keyboards as keys
 from random import randrange
 from db.dp_gino import db
 import asyncio
-from db import db_commands
+from db import quick_commands
 import db
 from pprint import pprint
 from vk import vk as vkfunc
 import json
 
-def gretting_msg(user_id, message, my_keyboard=keys.hello_keyboard):
+def write_msg_wk(user_id, message,my_keyboard=keys.hello_keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
                                     'message': message,
                                     'random_id': randrange(10 ** 7),
                                     'keyboard': my_keyboard.get_keyboard()})
 
-def write_msg(user_id, message, my_keyboard=keys.p_keyboard):
+def write_msg(user_id, message):
     vk_bot.method('messages.send', {'user_id': user_id,
                                 'message': message,
-                                'random_id': randrange(10 ** 7),
-                                'keyboard': my_keyboard.get_keyboard()})
+                                'random_id': randrange(10 ** 7)})
 
 
 def search_criteria():
@@ -64,6 +62,8 @@ def search_criteria():
                                             return criteria_data
 
 
+def new_user():
+    pass
 
 def suggest_person(user_id, message, my_keyboard=keys.p_keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
@@ -85,14 +85,15 @@ if __name__ == "__main__":
         if event.type == VkEventType.MESSAGE_NEW:
             if event.to_me:
                 request = event.text
+                # loop.run_until_complete(pprint(quick_commands.select_user(user_id=event.user_id)))
                 if request.lower() == 'отсутствует':
                     info = (vkfunc.take_user_info(event.user_id))
                     pprint(info)
-                    gretting_msg(event.user_id, f"Хай, {info['first_name']}!"
+                    write_msg(event.user_id, f"Хай, {info['first_name']}!"
                                              f"Приветствую тебя в Vkinder! Давайте определим критерии выбора,"
                                              f"нажав на кнопку <Установить критерии поиска>")
 
-                    loop.run_until_complete(db_commands.add_user(user_id=event.user_id, first_name=info['first_name'],
+                    loop.run_until_complete(quick_commands.add_user(user_id=event.user_id, first_name=info['first_name'],
                                                                  last_name=info['last_name'], city=str(info['city']), age=22,
                                                                  age_min=20, age_max=25, sex=str(info['sex'])))
                 elif request == 'Установить критерии поиска':

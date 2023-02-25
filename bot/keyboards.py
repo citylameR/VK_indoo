@@ -3,7 +3,6 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 hello_keyboard = VkKeyboard(one_time=True)
 hello_keyboard.add_button('Установить критерии поиска', color=VkKeyboardColor.SECONDARY)
 
-
 p_keyboard = VkKeyboard(one_time=False)
 p_keyboard.add_button('В избранное', color=VkKeyboardColor.POSITIVE)
 p_keyboard.add_button('Следующий', color=VkKeyboardColor.POSITIVE)
