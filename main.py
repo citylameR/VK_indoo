@@ -30,33 +30,38 @@ def write_msg(user_id, message, my_keyboard=keys.p_keyboard):
 def search_criteria():
     write_msg(event.user_id, '1) Введите минимальный возраст:')
     for event_min_age in longpoll.listen():
-        if event_min_age.type == VkEventType.MESSAGE_NEW and event_min_age.to_me: # Сделать проверку на интегер
-            min_age = event_min_age.text
-            if isinstance(min_age, int):
-                write_msg(event_min_age.user_id, 'Успешно')
-            else:
-                write_msg(event_min_age.user_id, 'Введите числовое значение')
-            write_msg(event.user_id, '2) Введите максимальный возраст:')
-            for event_max_age in longpoll.listen():
-                if event_max_age.type == VkEventType.MESSAGE_NEW and event_max_age.to_me:
-                    max_age = event_max_age.text
-                    if isinstance(max_age, int) and min_age <= max_age:
-                        write_msg(event_min_age.user_id, 'Успешно')
-                    else:
-                        write_msg(event_min_age.user_id, 'Введите числовое значение и оно должно быть больше минимального возраста')
-                    write_msg(event.user_id, '3) Введите пол:', my_keyboard=keys.keyboard_sex)
-                    for event_sex in longpoll.listen():
-                        if event_sex.type == VkEventType.MESSAGE_NEW and event_sex.to_me:
-                            sex = 2 if event_sex.text == 'мужской' else 1
-                            write_msg(event.user_id, '4) Город:')
-                            for event_city in longpoll.listen():
-                                if event_city.type == VkEventType.MESSAGE_NEW and event_city.to_me:
-                                    city = vk.get_city_index(event_city.text)
-                                    with open('criteria_file', 'w', encoding='UTF-8') as file:
-                                        criteria_data = {'min_age': min_age, 'max_age': max_age, 'sex': sex, 'city': city}
-                                        json.dump(criteria_data, file)
+        if event_min_age.type == VkEventType.MESSAGE_NEW and event_min_age.to_me:
 
-                                    return criteria_data
+            try:
+                min_age = int(event_min_age.text)
+                if min_age < 0 or min_age > 99:
+                    raise ValueError()
+            except ValueError:
+                write_msg(event.user_id, "Не число, или недопустимое число.")
+            else:
+                write_msg(event.user_id, '2) Введите максимальный возраст:')
+                for event_max_age in longpoll.listen():
+                    if event_max_age.type == VkEventType.MESSAGE_NEW and event_max_age.to_me:
+                        try:
+                            max_age = int(event_max_age.text)
+                            if max_age < 0 or max_age > 99 or max_age < min_age:
+                                raise ValueError
+                        except ValueError:
+                            write_msg(event.user_id, "Не число, или недопустимое число, или меньше минимального.")
+                        else:
+                            write_msg(event.user_id, '3) Введите пол:', my_keyboard=keys.keyboard_sex)
+                            for event_sex in longpoll.listen():
+                                if event_sex.type == VkEventType.MESSAGE_NEW and event_sex.to_me:
+                                    sex = 2 if event_sex.text == 'мужской' else 1
+                                    write_msg(event.user_id, '4) Город:')
+                                    for event_city in longpoll.listen():
+                                        if event_city.type == VkEventType.MESSAGE_NEW and event_city.to_me:
+                                            city = vk.get_city_index(event_city.text)
+                                            with open('criteria_file', 'w', encoding='UTF-8') as file:
+                                                criteria_data = {'min_age': min_age, 'max_age': max_age, 'sex': sex, 'city': city}
+                                                json.dump(criteria_data, file)
+
+                                            return criteria_data
 
 
 
