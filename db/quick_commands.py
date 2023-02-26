@@ -5,8 +5,8 @@ from db.schemas.user import User, Favorite_person, Favorites
 
 
 
-async def add_user(user_id: int, first_name: str, last_name: str, city: str, age: int, age_min: int,
-                   age_max: int, sex: str):
+async def add_user(user_id: int, first_name: str, last_name: str, city: int, age: int, age_min: int,
+                   age_max: int, sex: int):
 
     """
     Функция добавляет пользователя в базу данных
