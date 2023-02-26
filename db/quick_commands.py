@@ -61,7 +61,6 @@ async def list_favorites(user_id):
 async def delete_favorites(user_id):
     """
     Функция принимает user_id и удаляет избранного пользователя
-    :return:
     """
 
     favorite = await  Favorite_person.query.where(Favorite_person.user_id == user_id).gino.all()

@@ -1,2 +1,1 @@
-from vk import vk
-from vk import search
+from vk import vk, search_function
