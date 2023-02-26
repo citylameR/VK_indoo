@@ -4,27 +4,36 @@ from heapq import nlargest
 from tokens import token_vk
 from pprint import pprint
 
-def search_people(criteria):
-    URL_search_people = 'https://api.vk.com/method/users.search'
-    params_search_people = {
-        "access_token": token_vk,
-        'count': '1000',
-        'sex': criteria['sex'],
-        'age_from': criteria['min_age'],
-        'age_to': criteria['max_age'],
-        'has_photo': '1',
-        'is_closed': 'False',
-        'city': criteria['city'],
-        "v": "5.131"
-    }
-    response_search_people = requests.get(URL_search_people, params=params_search_people)
-    data_search_people = response_search_people.json()['response']['items']
-    list_id = []
-    for people in data_search_people:
-        list_id.append(people['id'])
-    person_id = random.choice(list_id)
-    return person_id
+def get_city_index(city: str):
+    url = "https://api.vk.com/method/database.getCities"
+    params = {"access_token": token_vk, "v": "5.131", "q": city, "count": "1"}
+    response = requests.get(url, params=params)
+    index = response.json()["response"]["items"][0]
+    return index['id']
 
+def search(criteria):
+    offer = []
+    url = "https://api.vk.com/method/users.search"
+    params = {
+        "access_token": token_vk,
+        "fields": "city, sex, can_write_private_message",
+        "v": "5.131",
+        "city": get_city_index(criteria['city']),
+        "age_from": criteria['min_age'],
+        "age_to": criteria['max_age'],
+        "has_photo": "1",
+        "count": "1000",
+        "sex": criteria['sex']
+    }
+    response = requests.get(url, params=params)
+    searched = response.json()['response']['items']
+    for result in searched:
+        if result['is_closed'] == False:
+            offer.append({'id': result['id'], 'first_name': result['first_name'], 'last_name': result['last_name'],
+                          'sex': result['sex'], 'can_write': result['can_write_private_message'],
+                          'href': f'vk.com/id{result["id"]}',
+                          })
+    return offer
 
 def take_photo(user_id):
     URL_id_photo = "https://api.vk.com/method/photos.get"
@@ -68,24 +77,9 @@ def take_user_info(user_id):
     return info
 
 
-def person_info(people_data):
+def person_info(criteria):
+    people_data = search(criteria)
     person = random.choice(people_data)
-    to_message = {'first_name': person['first_name'],
-                  'last_name': person['last_name'],
-                  'link': person['href'],
-                  'city': person['city'],
-                  'sex': person['sex'],
-                  'photo': take_photo(person['id'])}
+    to_message = '{} {} \n {}'.format(person['first_name'], person['last_name'], person['href'])
     return to_message
 
-def get_city_index(city: str):
-    url = 'https://api.vk.com/method/database.getCities'
-    params = {
-        "access_token": token_vk,
-        "v": "5.131",
-        "q": city,
-        "count": "1"
-    }
-    response = requests.get(url, params=params)
-    index = response.json()['response']['items'][0]
-    return index
