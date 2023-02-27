@@ -65,11 +65,11 @@ def search_criteria():
 def new_user():
     pass
 
-def suggest_person(user_id, message, my_keyboard=keys.p_keyboard):
+def suggest_person(user_id, message, attachments, my_keyboard=keys.p_keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
                                     'message': message,
                                     'random_id': randrange(10 ** 7),
-                                    'attacment': vk.take_photo(user_id)[0],
+                                    'attachment': attachments,
                                     'keyboard': my_keyboard.get_keyboard()})
 
 if __name__ == "__main__":
@@ -97,11 +97,19 @@ if __name__ == "__main__":
                                                                  last_name=info['last_name'], city=str(info['city']), age=22,
                                                                  age_min=20, age_max=25, sex=str(info['sex'])))
                 elif request == 'Установить критерии поиска':
-                    suggest_person(event.user_id, vk.person_info(search_criteria()))
+                    information = vk.person_info(search_criteria())
+                    text_message = '{} {} \n{}'.format(information['first_name'], information['last_name'],
+                                                       information['href'])
+                    attachments = ','.join(vk.take_photo(information['id']))
+                    suggest_person(event.user_id, message=text_message, attachments=attachments)
 
                 elif request == 'Следующий':
                     with open('criteria_file', 'r', encoding='UTF-8') as file:
                         data_criteria = json.load(file)
-                        suggest_person(event.user_id, vk.person_info(data_criteria))
+                        information = vk.person_info(data_criteria)
+                        text_message = '{} {} \n{}'.format(information['first_name'], information['last_name'],
+                                                           information['href'])
+                        attachments = ','.join(vk.take_photo(information['id']))
+                        suggest_person(event.user_id, message=text_message, attachments=attachments)
                 else:
                     write_msg(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")

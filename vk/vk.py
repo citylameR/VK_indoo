@@ -53,11 +53,13 @@ def take_photo(user_id):
             max_likes.append(photo["likes"]["count"])
         for photo in data_id_photo['items']:
             if photo["likes"]["count"] in nlargest(3, max_likes):
-                data_top_photo.append(photo["sizes"][-1]["url"])
+                photo_info = 'photo{}_{}'.format(user_id, photo['id'])
+                data_top_photo.append(photo_info)
         return data_top_photo
     else:
         for photo in data_id_photo['items']:
-            data_top_photo.append(photo["sizes"][-1]["url"])
+            photo_info = 'photo{}_{}'.format(user_id, photo['id'])
+            data_top_photo.append(photo_info)
         return data_top_photo
 
 
@@ -80,6 +82,5 @@ def take_user_info(user_id):
 def person_info(criteria):
     people_data = search(criteria)
     person = random.choice(people_data)
-    to_message = '{} {} \n {}'.format(person['first_name'], person['last_name'], person['href'])
-    return to_message
+    return person
 
