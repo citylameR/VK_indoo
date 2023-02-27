@@ -22,6 +22,7 @@ def search(criteria):
         "age_from": criteria['min_age'],
         "age_to": criteria['max_age'],
         "has_photo": "1",
+        'country': '1',
         "count": "1000",
         "sex": criteria['sex']
     }
