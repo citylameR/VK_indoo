@@ -3,6 +3,7 @@ import random
 from heapq import nlargest
 from tokens import token_vk
 from pprint import pprint
+import datetime
 
 def get_city_index(city: str):
     url = "https://api.vk.com/method/database.getCities"
@@ -76,7 +77,10 @@ def take_user_info(user_id):
     response_id_info = requests.get(URL_id_info, params=params_id_info)
     data_id_info = response_id_info.json()["response"][0]
     info = {"first_name": data_id_info['first_name'], "last_name": data_id_info['last_name'], "sex": data_id_info['sex'],
-            "city": data_id_info['city']['id']}
+            "city": data_id_info['city'], 'age': None}
+    if 'bdate' in data_id_info:
+        delta = datetime.datetime.today() - datetime.datetime.strptime(data_id_info['bdate'], '%d.%m.%Y')
+        info['age'] = delta.days//365
     return info
 
 
@@ -84,4 +88,3 @@ def person_info(criteria):
     people_data = search(criteria)
     person = random.choice(people_data)
     return person
-

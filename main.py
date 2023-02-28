@@ -12,7 +12,13 @@ from pprint import pprint
 from vk import vk as vkfunc
 import json
 
-def write_msg_wk(user_id, message, my_keyboard=keys.hello_keyboard):
+def write_msg(user_id, message):
+    vk_bot.method('messages.send', {'user_id': user_id,
+                                    'message': message,
+                                    'random_id': randrange(10 ** 7)})
+
+
+def write_msg_wk(user_id, message, my_keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
                                     'message': message,
                                     'random_id': randrange(10 ** 7),
@@ -55,8 +61,29 @@ def search_criteria():
                                             return criteria_data
 
 
-def new_user():
+def my_profile():
     pass
+
+def listen():
+    for event in longpoll.listen():
+        if event.type == VkEventType.MESSAGE_NEW:
+            if event.to_me:
+                request = event.text
+                return request
+
+
+def new_user(user_id):
+    write_msg(user_id, "Добро пожаловать в наш сервис для знакомств!"
+                          "Но для начала, давайте познакомимся с вами!")
+    info = (vkfunc.take_user_info(user_id))
+    register = Registration(user_id, info)
+    register.getname()
+    pprint(info)
+    loop.run_until_complete(quick_commands.add_user(user_id=user_id, first_name=info['first_name'],
+                                                    last_name=info['last_name'], city=info['city']['id'], age=22,
+                                                    age_min=20, age_max=25, sex=str(info['sex'])))
+
+
 
 def suggest_person(user_id, message, attachments, my_keyboard=keys.p_keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
@@ -64,6 +91,7 @@ def suggest_person(user_id, message, attachments, my_keyboard=keys.p_keyboard):
                                     'random_id': randrange(10 ** 7),
                                     'attachment': attachments,
                                     'keyboard': my_keyboard.get_keyboard()})
+
 def favour_or_blacklist():
     if request == 'В избранное':
         pass
@@ -71,6 +99,23 @@ def favour_or_blacklist():
         pass
     elif request == 'Список избранных':
         pass
+
+class Registration:
+    def __init__(self, id:int, info:dict):
+        self.id = id
+        self.info = info
+
+    def getname(self):
+        write_msg_wk(self.id, f'Вас зовут {self.info["first_name"]}?', keys.register_keys)
+        if listen() == 'Поменять':
+            write_msg(self.id, "Как Вас зовут?")
+            self.info['first_name'] = listen()
+        elif listen() == 'Да!':
+            write_msg(self.id, "Отлично!")
+        else:
+            print("чё за хуйня")
+        return self.info['first_name']
+
 
 
 if __name__ == "__main__":
@@ -81,11 +126,17 @@ if __name__ == "__main__":
     loop.run_until_complete(db.dp_gino.on_startup())
     print("Connected to database successfully")
 
-
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW:
             if event.to_me:
                 request = event.text
+                info = loop.run_until_complete(quick_commands.select_user(event.user_id))
+                if info == None:
+                    new_user(event.user_id)
+                else:
+                    write_msg_wk(event.user_id, f"Хай, я тебя узнал!", keys.hello_keyboard)
+
+
                 if request.lower() == 'отсутствует':
                     info = (vkfunc.take_user_info(event.user_id))
                     pprint(info)
@@ -94,7 +145,7 @@ if __name__ == "__main__":
                                              f"нажав на кнопку <Установить критерии поиска>")
 
                     loop.run_until_complete(quick_commands.add_user(user_id=event.user_id, first_name=info['first_name'],
-                                                                 last_name=info['last_name'], city=str(info['city']), age=22,
+                                                                 last_name=info['last_name'], city=info['city'], age=22,
                                                                  age_min=20, age_max=25, sex=str(info['sex'])))
                 elif request == 'Установить критерии поиска':
                     information = vk.person_info(search_criteria())

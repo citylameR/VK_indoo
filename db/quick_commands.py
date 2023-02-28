@@ -28,8 +28,19 @@ async def select_user(user_id):
     """
 
     user = await User.query.where(User.user_id == user_id).gino.first()
-    if user == True:
-        print('Пользователь есть')
+    if user == None:
+        return None
+    else:
+        usr = {}
+        usr['id'] = user.user_id
+        usr['first_name'] = user.first_name
+        usr['last_name'] = user.last_name
+        usr['city'] = user.city
+        usr['sex'] = user.sex
+        usr['age'] = user.age
+        usr['age_min'] = user.age_min
+        usr['age_max'] = user.age_max
+        return usr
 
 async def add_favorites_person(user_id, favorites_id, url):
     """
