@@ -18,7 +18,7 @@ class User(TimedBaseModel):
     age = Column(BigInteger)
     age_min = Column(BigInteger)
     age_max = Column(BigInteger)
-    sex = Column(String(30))
+    sex = Column(BigInteger)
 
     query: sql.select
 
