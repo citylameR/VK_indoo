@@ -13,20 +13,14 @@ from pprint import pprint
 from vk import vk as vkfunc
 import json
 
-def write_msg_wk(user_id, message,my_keyboard=keys.hello_keyboard):
+def write_msg_wk(user_id, message, my_keyboard=keys.hello_keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
                                     'message': message,
                                     'random_id': randrange(10 ** 7),
                                     'keyboard': my_keyboard.get_keyboard()})
 
-def write_msg(user_id, message):
-    vk_bot.method('messages.send', {'user_id': user_id,
-                                'message': message,
-                                'random_id': randrange(10 ** 7)})
-
-
 def search_criteria():
-    write_msg(event.user_id, '1) Введите минимальный возраст:')
+    write_msg_wk(event.user_id, '1) Введите минимальный возраст:')
     for event_min_age in longpoll.listen():
         if event_min_age.type == VkEventType.MESSAGE_NEW and event_min_age.to_me:
 
@@ -35,9 +29,9 @@ def search_criteria():
                 if min_age < 0 or min_age > 99:
                     raise ValueError()
             except ValueError:
-                write_msg(event.user_id, "Не число, или недопустимое число.")
+                write_msg_wk(event.user_id, "Не число, или недопустимое число.")
             else:
-                write_msg(event.user_id, '2) Введите максимальный возраст:')
+                write_msg_wk(event.user_id, '2) Введите максимальный возраст:')
                 for event_max_age in longpoll.listen():
                     if event_max_age.type == VkEventType.MESSAGE_NEW and event_max_age.to_me:
                         try:
@@ -45,17 +39,17 @@ def search_criteria():
                             if max_age < 0 or max_age > 99 or max_age < min_age:
                                 raise ValueError
                         except ValueError:
-                            write_msg(event.user_id, "Не число, или недопустимое число, или меньше минимального.")
+                            write_msg_wk(event.user_id, "Не число, или недопустимое число, или меньше минимального.")
                         else:
-                            write_msg(event.user_id, '3) Введите пол:', my_keyboard=keys.keyboard_sex)
+                            write_msg_wk(event.user_id, '3) Введите пол:', my_keyboard=keys.keyboard_sex)
                             for event_sex in longpoll.listen():
                                 if event_sex.type == VkEventType.MESSAGE_NEW and event_sex.to_me:
                                     sex = 2 if event_sex.text == 'мужской' else 1
-                                    write_msg(event.user_id, '4) Город:')
+                                    write_msg_wk(event.user_id, '4) Город:')
                                     for event_city in longpoll.listen():
                                         if event_city.type == VkEventType.MESSAGE_NEW and event_city.to_me:
                                             city = vk.get_city_index(event_city.text)
-                                            with open('criteria_file', 'w', encoding='UTF-8') as file:
+                                            with open('criteria_file.json', 'w', encoding='UTF-8') as file:
                                                 criteria_data = {'min_age': min_age, 'max_age': max_age, 'sex': sex, 'city': city}
                                                 json.dump(criteria_data, file)
 
@@ -65,12 +59,20 @@ def search_criteria():
 def new_user():
     pass
 
-def suggest_person(user_id, message, my_keyboard=keys.p_keyboard):
+def suggest_person(user_id, message, attachments, my_keyboard=keys.p_keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
                                     'message': message,
                                     'random_id': randrange(10 ** 7),
-                                    'attacment': vk.take_photo(user_id)[0],
+                                    'attachment': attachments,
                                     'keyboard': my_keyboard.get_keyboard()})
+def favour_or_blacklist():
+    if request == 'В избранное':
+        pass
+    elif request == 'В черный список':
+        pass
+    elif request == 'Список избранных':
+        pass
+
 
 if __name__ == "__main__":
     vk_bot = vk_api.VkApi(token=config.token_bot)
@@ -89,7 +91,7 @@ if __name__ == "__main__":
                 if request.lower() == 'отсутствует':
                     info = (vkfunc.take_user_info(event.user_id))
                     pprint(info)
-                    write_msg(event.user_id, f"Хай, {info['first_name']}!"
+                    write_msg_wk(event.user_id, f"Хай, {info['first_name']}!"
                                              f"Приветствую тебя в Vkinder! Давайте определим критерии выбора,"
                                              f"нажав на кнопку <Установить критерии поиска>")
 
@@ -97,11 +99,19 @@ if __name__ == "__main__":
                                                                  last_name=info['last_name'], city=str(info['city']), age=22,
                                                                  age_min=20, age_max=25, sex=str(info['sex'])))
                 elif request == 'Установить критерии поиска':
-                    suggest_person(event.user_id, vk.person_info(search_criteria()))
+                    information = vk.person_info(search_criteria())
+                    text_message = '{} {} \n{}'.format(information['first_name'], information['last_name'],
+                                                       information['href'])
+                    attachments = ','.join(vk.take_photo(information['id']))
+                    suggest_person(event.user_id, message=text_message, attachments=attachments)
 
                 elif request == 'Следующий':
-                    with open('criteria_file', 'r', encoding='UTF-8') as file:
+                    with open('criteria_file.json', 'r', encoding='UTF-8') as file:
                         data_criteria = json.load(file)
-                        suggest_person(event.user_id, vk.person_info(data_criteria))
+                        information = vk.person_info(data_criteria)
+                        text_message = '{} {} \n{}'.format(information['first_name'], information['last_name'],
+                                                           information['href'])
+                        attachments = ','.join(vk.take_photo(information['id']))
+                        suggest_person(event.user_id, message=text_message, attachments=attachments)
                 else:
-                    write_msg(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")
+                    write_msg_wk(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")
