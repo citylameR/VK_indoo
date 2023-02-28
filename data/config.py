@@ -1,10 +1,10 @@
 import os
 import dotenv
 
+dotenv.load_dotenv()
+
 token_vk = ''
 token_bot = ''
-
-dotenv.load_dotenv()
 
 PGUSER = str(os.getenv('PGUSER'))
 PGPASSWORD = str(os.getenv('PGPASSWORD'))

@@ -1,5 +1,4 @@
 from vk import vk
-import json
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from data import config
@@ -87,7 +86,6 @@ if __name__ == "__main__":
         if event.type == VkEventType.MESSAGE_NEW:
             if event.to_me:
                 request = event.text
-                # loop.run_until_complete(pprint(quick_commands.select_user(user_id=event.user_id)))
                 if request.lower() == 'отсутствует':
                     info = (vkfunc.take_user_info(event.user_id))
                     pprint(info)
