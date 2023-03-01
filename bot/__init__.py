@@ -1,1 +1,1 @@
-from bot import keyboards
+from bot import keyboards, funcs, registration, mainmenu, new_user

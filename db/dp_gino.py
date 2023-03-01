@@ -37,6 +37,6 @@ class TimedBaseModel(BaseModel):
 
 async def on_startup():
     await db.set_bind(config.POSTGRES_URI)
-    # if config.resetdb == 1:
-    # await db.gino.drop_all()
-    # await db.gino.create_all()
+    if config.resetdb == 1:
+        await db.gino.drop_all()
+        await db.gino.create_all()

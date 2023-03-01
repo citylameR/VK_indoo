@@ -13,4 +13,4 @@ ip = os.getenv('ip')
 
 POSTGRES_URI = f'postgresql://{PGUSER}:{PGPASSWORD}@{ip}/{DATABASE}'
 
-resetdb = 0
+resetdb = 1

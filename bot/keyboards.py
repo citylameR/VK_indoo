@@ -13,9 +13,16 @@ p_keyboard.add_line()
 p_keyboard.add_button('Установить критерии поиска', color=VkKeyboardColor.SECONDARY)
 
 keyboard_sex = VkKeyboard(one_time=True)
-keyboard_sex.add_button('мужской', color=VkKeyboardColor.POSITIVE)
-keyboard_sex.add_button('женский', color=VkKeyboardColor.NEGATIVE)
+keyboard_sex.add_button('Мужчин', color=VkKeyboardColor.POSITIVE)
+keyboard_sex.add_button('Девушек', color=VkKeyboardColor.NEGATIVE)
 
 register_keys = VkKeyboard(one_time=True)
 register_keys.add_button('Да!', color=VkKeyboardColor.POSITIVE)
 register_keys.add_button('Поменять', color=VkKeyboardColor.NEGATIVE)
+
+menu_keys = VkKeyboard(one_time=True)
+menu_keys.add_button('Начать просмотр анкет', color=VkKeyboardColor.SECONDARY)
+menu_keys.add_line()
+menu_keys.add_button('Настройки профиля', color=VkKeyboardColor.SECONDARY)
+menu_keys.add_line()
+menu_keys.add_button('Список избранных', color=VkKeyboardColor.SECONDARY)

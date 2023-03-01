@@ -1,4 +1,5 @@
-from vk import vk
+import vk
+import bot
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from data import config
@@ -11,18 +12,6 @@ import db
 from pprint import pprint
 from vk import vk as vkfunc
 import json
-
-def write_msg(user_id, message):
-    vk_bot.method('messages.send', {'user_id': user_id,
-                                    'message': message,
-                                    'random_id': randrange(10 ** 7)})
-
-
-def write_msg_wk(user_id, message, my_keyboard):
-    vk_bot.method('messages.send', {'user_id': user_id,
-                                    'message': message,
-                                    'random_id': randrange(10 ** 7),
-                                    'keyboard': my_keyboard.get_keyboard()})
 
 def search_criteria():
     write_msg_wk(event.user_id, '1) Введите минимальный возраст:')
@@ -61,30 +50,6 @@ def search_criteria():
                                             return criteria_data
 
 
-def my_profile():
-    pass
-
-def listen():
-    for event in longpoll.listen():
-        if event.type == VkEventType.MESSAGE_NEW:
-            if event.to_me:
-                request = event.text
-                return request
-
-
-def new_user(user_id):
-    write_msg(user_id, "Добро пожаловать в наш сервис для знакомств!"
-                          "Но для начала, давайте познакомимся с вами!")
-    info = (vkfunc.take_user_info(user_id))
-    register = Registration(user_id, info)
-    register.getname()
-    pprint(info)
-    loop.run_until_complete(quick_commands.add_user(user_id=user_id, first_name=info['first_name'],
-                                                    last_name=info['last_name'], city=info['city']['id'], age=22,
-                                                    age_min=20, age_max=25, sex=str(info['sex'])))
-
-
-
 def suggest_person(user_id, message, attachments, my_keyboard=keys.p_keyboard):
     vk_bot.method('messages.send', {'user_id': user_id,
                                     'message': message,
@@ -92,75 +57,46 @@ def suggest_person(user_id, message, attachments, my_keyboard=keys.p_keyboard):
                                     'attachment': attachments,
                                     'keyboard': my_keyboard.get_keyboard()})
 
-def favour_or_blacklist():
-    if request == 'В избранное':
-        pass
-    elif request == 'В черный список':
-        pass
-    elif request == 'Список избранных':
-        pass
-
-class Registration:
-    def __init__(self, id:int, info:dict):
-        self.id = id
-        self.info = info
-
-    def getname(self):
-        write_msg_wk(self.id, f'Вас зовут {self.info["first_name"]}?', keys.register_keys)
-        if listen() == 'Поменять':
-            write_msg(self.id, "Как Вас зовут?")
-            self.info['first_name'] = listen()
-        elif listen() == 'Да!':
-            write_msg(self.id, "Отлично!")
-        else:
-            print("чё за хуйня")
-        return self.info['first_name']
-
-
 
 if __name__ == "__main__":
     vk_bot = vk_api.VkApi(token=config.token_bot)
-    longpoll = VkLongPoll(vk_bot)
+    botfunc = bot.funcs.Botfuncs(vk_bot)
     print("Bot started succesfully")
     loop = asyncio.get_event_loop()
     loop.run_until_complete(db.dp_gino.on_startup())
     print("Connected to database successfully")
-
+    longpoll = VkLongPoll(vk_bot)
+    active_session = []
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW:
             if event.to_me:
-                request = event.text
-                info = loop.run_until_complete(quick_commands.select_user(event.user_id))
-                if info == None:
-                    new_user(event.user_id)
-                else:
-                    write_msg_wk(event.user_id, f"Хай, я тебя узнал!", keys.hello_keyboard)
+                if event.user_id not in active_session:
+                    active_session.append(event.user_id)
+                    info = loop.run_until_complete(quick_commands.select_user(event.user_id))
+                    bot.mainmenu.mainmenu(event.user_id, vk_bot, info)
 
 
-                if request.lower() == 'отсутствует':
-                    info = (vkfunc.take_user_info(event.user_id))
-                    pprint(info)
-                    write_msg_wk(event.user_id, f"Хай, {info['first_name']}!"
-                                             f"Приветствую тебя в Vkinder! Давайте определим критерии выбора,"
-                                             f"нажав на кнопку <Установить критерии поиска>")
-
-                    loop.run_until_complete(quick_commands.add_user(user_id=event.user_id, first_name=info['first_name'],
-                                                                 last_name=info['last_name'], city=info['city'], age=22,
-                                                                 age_min=20, age_max=25, sex=str(info['sex'])))
-                elif request == 'Установить критерии поиска':
-                    information = vk.person_info(search_criteria())
-                    text_message = '{} {} \n{}'.format(information['first_name'], information['last_name'],
-                                                       information['href'])
-                    attachments = ','.join(vk.take_photo(information['id']))
-                    suggest_person(event.user_id, message=text_message, attachments=attachments)
-
-                elif request == 'Следующий':
-                    with open('criteria_file.json', 'r', encoding='UTF-8') as file:
-                        data_criteria = json.load(file)
-                        information = vk.person_info(data_criteria)
-                        text_message = '{} {} \n{}'.format(information['first_name'], information['last_name'],
-                                                           information['href'])
-                        attachments = ','.join(vk.take_photo(information['id']))
-                        suggest_person(event.user_id, message=text_message, attachments=attachments)
-                else:
-                    write_msg_wk(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")
+                # if request.lower() == 'отсутствует':
+                #     info = (vkfunc.take_user_info(event.user_id))
+                #     pprint(info)
+                #     write_msg_wk(event.user_id, f"Хай, {info['first_name']}!"
+                #                              f"Приветствую тебя в Vkinder! Давайте определим критерии выбора,"
+                #                              f"нажав на кнопку <Установить критерии поиска>")
+                #
+                # elif request == 'Установить критерии поиска':
+                #     information = vk.person_info(search_criteria())
+                #     text_message = '{} {} \n{}'.format(information['first_name'], information['last_name'],
+                #                                        information['href'])
+                #     attachments = ','.join(vk.take_photo(information['id']))
+                #     suggest_person(event.user_id, message=text_message, attachments=attachments)
+                #
+                # elif request == 'Следующий':
+                #     with open('criteria_file.json', 'r', encoding='UTF-8') as file:
+                #         data_criteria = json.load(file)
+                #         information = vk.person_info(data_criteria)
+                #         text_message = '{} {} \n{}'.format(information['first_name'], information['last_name'],
+                #                                            information['href'])
+                #         attachments = ','.join(vk.take_photo(information['id']))
+                #         suggest_person(event.user_id, message=text_message, attachments=attachments)
+                # else:
+                #     write_msg_wk(event.user_id, "Я Вас не понимаю :) Для начала напишите: Да")

@@ -5,12 +5,7 @@ from tokens import token_vk
 from pprint import pprint
 import datetime
 
-def get_city_index(city: str):
-    url = "https://api.vk.com/method/database.getCities"
-    params = {"access_token": token_vk, "v": "5.131", "q": city, "count": "1"}
-    response = requests.get(url, params=params)
-    index = response.json()["response"]["items"][0]
-    return index['id']
+
 
 def search(criteria):
     offer = []
