@@ -54,9 +54,9 @@ class Registration:
         req = self.botfunc.listen()
         while True:
             if req == "Мужчин":
-                return 1
-            elif req == "Девушек":
                 return 2
+            elif req == "Девушек":
+                return 1
         self.botfunc.write_msg_wk(self.id, "Я вас не понимаю :(\nДавайте попробуем ещё раз!", keys.keyboard_sex)
         req = self.botfunc.listen()
 

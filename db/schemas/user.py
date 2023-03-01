@@ -37,22 +37,13 @@ class Favorites(TimedBaseModel):
 
     __tablename__ = 'favorites'
 
-    favorite_id = Column(BigInteger, primary_key=True)
-    url = Column(String, nullable = False)
-
-
-    query: sql.select
-
-
-class Favorite_person(TimedBaseModel):
-
-    __tablename__ = 'favorite_person'
-
     user_id = Column(BigInteger, ForeignKey('users.user_id'))
-    favorites_id = Column(BigInteger, ForeignKey('favorites.favorite_id'))
-    pk = db.PrimaryKeyConstraint('user_id', 'favorites_id', name='favorite_pk')
+    favorite_id = Column(BigInteger)
+
 
     query: sql.select
+
+
 
     def __str__(self):
         return f'{self.favorites_id}'

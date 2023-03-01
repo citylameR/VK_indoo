@@ -1,8 +1,9 @@
 import requests
-from tokens import token_vk
+from data.config import token_vk
+from pprint import pprint
 
 
-def search(criteria):
+def search(criteria, offset):
     offer = []
     url = "https://api.vk.com/method/users.search"
     params = {
@@ -10,11 +11,12 @@ def search(criteria):
         "fields": "city, sex, can_write_private_message",
         "v": "5.131",
         "city": criteria['city'],
-        "age_from": criteria['min_age'],
-        "age_to": criteria['max_age'],
+        "age_from": criteria['age_min'],
+        "age_to": criteria['age_max'],
         "has_photo": "1",
-        "count": "1000",
-        "sex": criteria['sex']
+        "count": "20",
+        "sex": criteria['sex'],
+        "offset": offset
     }
     response = requests.get(url, params=params)
     searched = response.json()['response']['items']
@@ -26,5 +28,4 @@ def search(criteria):
                           })
     return offer
 
-# criteria_data = {'min_age': 15, 'max_age': 20, 'sex': 2, 'city': 1}
-# print(search(criteria_data))
+
