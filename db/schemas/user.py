@@ -1,8 +1,6 @@
 from sqlalchemy import Column, BigInteger, String, sql, ForeignKey
-import asyncio
 
-from data import config
-from db.dp_gino import TimedBaseModel, db
+from db.dp_gino import TimedBaseModel
 
 
 class User(TimedBaseModel):
