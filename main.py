@@ -22,5 +22,7 @@ if __name__ == "__main__":
             if event.to_me:
                 if event.user_id not in active_session:
                     active_session.append(event.user_id)
-                    info = loop.run_until_complete(quick_commands.select_user(event.user_id))
+                    info = loop.run_until_complete(
+                        quick_commands.select_user(event.user_id)
+                    )
                     bot.mainmenu.mainmenu(event.user_id, vk_bot, info)

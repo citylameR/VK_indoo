@@ -6,7 +6,6 @@ from pprint import pprint
 import datetime
 
 
-
 def search(criteria):
     offer = []
     url = "https://api.vk.com/method/users.search"
@@ -14,23 +13,30 @@ def search(criteria):
         "access_token": token_vk,
         "fields": "city, sex, can_write_private_message",
         "v": "5.131",
-        "city": get_city_index(criteria['city']),
-        "age_from": criteria['min_age'],
-        "age_to": criteria['max_age'],
+        "city": get_city_index(criteria["city"]),
+        "age_from": criteria["min_age"],
+        "age_to": criteria["max_age"],
         "has_photo": "1",
-        'country': '1',
+        "country": "1",
         "count": "1000",
-        "sex": criteria['sex']
+        "sex": criteria["sex"],
     }
     response = requests.get(url, params=params)
-    searched = response.json()['response']['items']
+    searched = response.json()["response"]["items"]
     for result in searched:
-        if result['is_closed'] == False:
-            offer.append({'id': result['id'], 'first_name': result['first_name'], 'last_name': result['last_name'],
-                          'sex': result['sex'], 'can_write': result['can_write_private_message'],
-                          'href': f'vk.com/id{result["id"]}',
-                          })
+        if result["is_closed"] == False:
+            offer.append(
+                {
+                    "id": result["id"],
+                    "first_name": result["first_name"],
+                    "last_name": result["last_name"],
+                    "sex": result["sex"],
+                    "can_write": result["can_write_private_message"],
+                    "href": f'vk.com/id{result["id"]}',
+                }
+            )
     return offer
+
 
 def take_photo(user_id):
     URL_id_photo = "https://api.vk.com/method/photos.get"
@@ -45,17 +51,17 @@ def take_photo(user_id):
     data_id_photo = response_id_photo.json()["response"]
     max_likes = []
     data_top_photo = []
-    if data_id_photo['count']>=3:
-        for photo in data_id_photo['items']:
+    if data_id_photo["count"] >= 3:
+        for photo in data_id_photo["items"]:
             max_likes.append(photo["likes"]["count"])
-        for photo in data_id_photo['items']:
+        for photo in data_id_photo["items"]:
             if photo["likes"]["count"] in nlargest(3, max_likes):
-                photo_info = 'photo{}_{}'.format(user_id, photo['id'])
+                photo_info = "photo{}_{}".format(user_id, photo["id"])
                 data_top_photo.append(photo_info)
         return data_top_photo
     else:
-        for photo in data_id_photo['items']:
-            photo_info = 'photo{}_{}'.format(user_id, photo['id'])
+        for photo in data_id_photo["items"]:
+            photo_info = "photo{}_{}".format(user_id, photo["id"])
             data_top_photo.append(photo_info)
         return data_top_photo
 
@@ -71,11 +77,18 @@ def take_user_info(user_id):
     }
     response_id_info = requests.get(URL_id_info, params=params_id_info)
     data_id_info = response_id_info.json()["response"][0]
-    info = {"first_name": data_id_info['first_name'], "last_name": data_id_info['last_name'], "sex": data_id_info['sex'],
-            "city": data_id_info['city'], 'age': None}
-    if 'bdate' in data_id_info:
-        delta = datetime.datetime.today() - datetime.datetime.strptime(data_id_info['bdate'], '%d.%m.%Y')
-        info['age'] = delta.days//365
+    info = {
+        "first_name": data_id_info["first_name"],
+        "last_name": data_id_info["last_name"],
+        "sex": data_id_info["sex"],
+        "city": data_id_info["city"],
+        "age": None,
+    }
+    if "bdate" in data_id_info:
+        delta = datetime.datetime.today() - datetime.datetime.strptime(
+            data_id_info["bdate"], "%d.%m.%Y"
+        )
+        info["age"] = delta.days // 365
     return info
 
 
