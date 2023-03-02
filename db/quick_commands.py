@@ -1,8 +1,7 @@
 from asyncpg import UniqueViolationError
 
 from db.dp_gino import db
-from db.schemas.user import User, Favorite_person, Favorites
-
+from db.schemas.user import User, Favorite_person, Favorites, Offer
 
 
 async def add_user(user_id: int, first_name: str, last_name: str, city: int, age: int, age_min: int,
@@ -66,3 +65,10 @@ async def delete_favorites(user_id):
 
     favorite = await  Favorite_person.query.where(Favorite_person.user_id == user_id).gino.all()
     await favorite.delete()
+
+async def add_offer(offered_id, user_id):
+    user = await db.scalar(db.exists().where(Offer.user_id == user_id and Offer.offer_id == offered_id).select())
+    if user is False:
+        offered = Offer(offer_id=offered_id, user_id=user_id)
+        await offered.create()
+        return 'added'
