@@ -1,6 +1,9 @@
 from asyncpg import UniqueViolationError
 
-from db.schemas.user import User, Favorites
+
+from db.dp_gino import db
+from db.schemas.user import User, Favorites, Offer
+
 
 
 async def add_user(
@@ -13,6 +16,7 @@ async def add_user(
     age_max: int,
     sex: int,
 ):
+
     """
     Функция добавляет пользователя в базу данных
     """
@@ -74,10 +78,17 @@ async def list_favorites(user_id):
     return favorites_list
 
 
-# async def delete_favorites(user_id):
-#     """
-#     Функция принимает user_id и удаляет избранного пользователя
-#     """
-#
-#     favorite = await  Favorite_person.query.where(Favorite_person.user_id == user_id).gino.all()
-#     await favorite.delete()
+async def delete_favorites(user_id):
+    """
+    Функция принимает user_id и удаляет избранного пользователя
+    """
+
+    favorite = await Favorite_person.query.where(Favorite_person.user_id == user_id).gino.all()
+    await favorite.delete()
+
+async def add_offer(offered_id, user_id):
+    user = await db.scalar(db.exists().where(Offer.user_id == user_id and Offer.offer_id == offered_id).select())
+    if user is False:
+        offered = Offer(offer_id=offered_id, user_id=user_id)
+        await offered.create()
+        return 'added'

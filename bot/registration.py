@@ -87,10 +87,12 @@ class Registration:
 
     def getage_min(self):
         self.botfunc.write_msg(self.id, "Введите минимальный возраст для поиска:")
-        return self.botfunc.listen()
+        min_age = bot.age_check.check_min_age(self.botfunc.listen())
+        return min_age
 
     def getage_max(self):
         self.botfunc.write_msg(
             self.id, "Теперь введите максимальный возраст для поиска:"
         )
-        return self.botfunc.listen()
+        max_age = bot.age_check.check_max_age(self.botfunc.listen(), self.getage_min())
+        return max_age
