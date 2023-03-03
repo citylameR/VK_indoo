@@ -34,4 +34,4 @@ def new_user(user_id, botfunc, vk_bot):
             sex=info["sex"],
         )
     )
-    botfunc.write_msg(user_id, "Процесс регистрации наконец-то, блять, завершён")
+    botfunc.write_msg(user_id, "Процесс регистрации наконец-то завершён")

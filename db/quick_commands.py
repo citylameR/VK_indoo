@@ -1,6 +1,5 @@
 from asyncpg import UniqueViolationError
 
-from db.dp_gino import db
 from db.schemas.user import User, Favorites
 
 

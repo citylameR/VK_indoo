@@ -1,6 +1,5 @@
 import requests
 from data.config import token_vk
-from pprint import pprint
 
 
 def search(criteria, offset):
