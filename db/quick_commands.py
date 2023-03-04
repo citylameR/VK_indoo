@@ -13,7 +13,7 @@ async def add_user(
     age_min: int,
     age_max: int,
     sex: int,
-):
+    ):
 
     """
     Функция добавляет пользователя в базу данных
@@ -34,7 +34,26 @@ async def add_user(
     except UniqueViolationError:
         print("Пользователь не добавлен")
 
+async def update_user(
+    user_id: int,
+    first_name: str,
+    last_name: str,
+    city: int,
+    age: int,
+    age_min: int,
+    age_max: int,
+    sex: int,
+    ):
 
+    updated_user = await select_user(user_id)
+    await updated_user.update(first_name=first_name,
+                              last_name=last_name,
+                              city=city, age=age,
+                              age_min=age_min,
+                              age_max=age_max,
+                              sex=sex).apply()
+
+    return updated_user
 async def add_fav(user_id: int, fav_id: int):
     try:
         favorite = Favorites(user_id=user_id, favorite_id=fav_id)
