@@ -45,6 +45,12 @@ async def upd_user(
                               age_max=age_max,
                               sex=sex,
                               city_title=city_title).apply()
+async def add_fav(user_id: int, fav_id: int):
+    try:
+        favorite = Favorites(user_id=user_id, favorite_id=fav_id)
+        await favorite.create()
+    except UniqueViolationError:
+        print("Пользователь не добавлен")
 
     return updated_user
 
