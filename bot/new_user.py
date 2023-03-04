@@ -2,6 +2,7 @@ import bot
 from vk import vk as vkfunc
 from db import quick_commands
 import asyncio
+from pprint import pprint
 
 
 def new_user(user_id, botfunc, vk_bot):
@@ -20,7 +21,7 @@ def new_user(user_id, botfunc, vk_bot):
     info["sex"] = register.getsex()
     botfunc.write_msg(user_id, "Осталось совсем чуть-чуть!")
     info["age_min"] = int(register.getage_min())
-    info["age_max"] = int(register.getage_max())
+    info["age_max"] = int(register.getage_max(info["age_min"]))
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
         quick_commands.add_user(
@@ -34,4 +35,5 @@ def new_user(user_id, botfunc, vk_bot):
             sex=info["sex"],
         )
     )
+
     botfunc.write_msg(user_id, "Процесс регистрации, наконец-то, завершён! :)")

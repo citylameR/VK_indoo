@@ -21,7 +21,7 @@ class User(TimedBaseModel):
 class Black_list(TimedBaseModel):
     __tablename__ = "black_list"
 
-    user_id = Column(BigInteger, ForeignKey("users.user_id"))
+    user_id = Column(BigInteger)
     reason = Column(String)
     status = Column(String)
 
@@ -34,6 +34,7 @@ class Favorites(TimedBaseModel):
 
     user_id = Column(BigInteger, ForeignKey("users.user_id"))
     favorite_id = Column(BigInteger)
+    name = Column(String)
 
     query: sql.select
 
@@ -44,7 +45,7 @@ class Favorites(TimedBaseModel):
 class Offer(TimedBaseModel):
     __tablename__ = "offer"
 
-    offer_id = Column(BigInteger, primary_key=True)
     user_id = Column(BigInteger, ForeignKey("users.user_id"))
+    offer_id = Column(BigInteger)
 
     query: sql.select

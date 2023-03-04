@@ -8,7 +8,12 @@
 Этот бот требует Python 3.* и следующие пакеты:
 
 * SQLAlchemy;
-* VK-Api
+* VK-Api;
+* PyTest;
+* Requests;
+* Gino;
+* AsyncPG;
+* python - dotenv.
 
 ## Установка
 
@@ -20,7 +25,9 @@ git clone https://github.com/citylameR/VK_indoo.git
 cd VK_indoo
 pip install -r requirements.txt
 ```
-В файлах congig.py поменяйте все токены и пароли
+В файле `.env` поменяйте ip, логин, пароль и название БД, к которой будете подключаться.
+
+В файле `data/config.py` укажите токен ВК и токен Вк-бота, а также в переменной `resetdb` установите `1` - для очистки текущей БД **или** `0` - для сохранения текущей БД.
 
 ## Использование
 

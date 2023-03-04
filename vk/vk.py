@@ -2,7 +2,6 @@ import requests
 import random
 from heapq import nlargest
 from tokens import token_vk
-from pprint import pprint
 import datetime
 
 

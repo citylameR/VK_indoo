@@ -6,6 +6,7 @@ from db.dp_gino import db
 import asyncio
 from db import quick_commands
 import db
+from pprint import pprint
 
 
 if __name__ == "__main__":
@@ -14,7 +15,6 @@ if __name__ == "__main__":
     print("Bot started succesfully")
     loop = asyncio.get_event_loop()
     loop.run_until_complete(db.dp_gino.on_startup())
-    print("Connected to database successfully")
     longpoll = VkLongPoll(vk_bot)
     active_session = []
     for event in longpoll.listen():
