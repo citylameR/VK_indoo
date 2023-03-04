@@ -10,12 +10,14 @@ from db import quick_commands
 def suggest_person(vk_bot, offer, user_id, my_keyboard=keys.p_keyboard):
     loop = asyncio.get_event_loop()
     loop.run_until_complete(quick_commands.add_offer(user_id, offer["id"]))
-    message = "{} {} \n{}".format(
-        offer["first_name"], offer["last_name"], offer["href"]
-    )
+    message = f'*id{offer["id"]}({offer["first_name"]} {offer["last_name"]})'
+    if offer["age"] != None: message += f', {offer["age"]}'
+    if offer["city"] != None: message += f'\n{offer["city"]}'
+    pprint(offer)
+
     attachments = ",".join(vk.vk.take_photo(offer["id"]))
     if offer["can_write"] == 1:
-        message += "\n\nЛИЧКА ОТКРЫТА"
+        message += "\n\n!ЛИЧКА ОТКРЫТА!"
     vk_bot.method(
         "messages.send",
         {

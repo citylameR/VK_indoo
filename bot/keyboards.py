@@ -35,4 +35,6 @@ profile_keys.add_line()
 profile_keys.add_button("Пол", color=VkKeyboardColor.SECONDARY)
 profile_keys.add_button("Назад", color=VkKeyboardColor.SECONDARY)
 
-
+favs_keys = VkKeyboard(one_time=True)
+favs_keys.add_button("Удалить из избранного", color=VkKeyboardColor.SECONDARY)
+favs_keys.add_button("Назад", color=VkKeyboardColor.SECONDARY)

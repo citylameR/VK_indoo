@@ -6,5 +6,6 @@ from bot import (
     new_user,
     start_search,
     age_check,
-    profile
+    profile,
+    favorite
 )

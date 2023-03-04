@@ -10,6 +10,7 @@ class User(TimedBaseModel):
     first_name = Column(String(200))
     last_name = Column(String(200))
     city = Column(BigInteger)
+    city_title = Column(String(200))
     age = Column(BigInteger)
     age_min = Column(BigInteger)
     age_max = Column(BigInteger)

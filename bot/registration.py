@@ -37,9 +37,9 @@ class Registration:
                 self.botfunc.write_msg(self.id, "В каком городе будем искать?")
                 city = vk.getcityindex.get_city_index(self.botfunc.listen())
                 self.botfunc.write_msg(self.id, f'Установлен город {city["title"]}!')
-                return city["id"]
+                return city
             elif req == "Да!":
-                return self.info["city"]["id"]
+                return self.info["city"]
             self.botfunc.write_msg_wk(
                 self.id,
                 "Я вас не понимаю :(\nДавайте попробуем ещё раз!",
@@ -64,7 +64,7 @@ class Registration:
                     self.botfunc.write_msg(self.id, "Я Вас не понимаю :(\nПопробуйте ещё раз!")
                 age = self.botfunc.listen()
                 check = bot.age_check.chk_min(age)
-        self.botfunc.write_msg(
+        self.botfunc.write_msg_wk(
             self.id, f'Ваш возраст {self.info["age"]}?', keys.register_keys
         )
         req = self.botfunc.listen()

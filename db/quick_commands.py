@@ -14,28 +14,39 @@ async def add_user(
     age: int,
     age_min: int,
     age_max: int,
-    sex: int
+    sex: int,
+    city_title: str
 ):
 
     try:
         user = User(user_id=user_id, first_name=first_name, last_name=last_name, city=city, age=age,
-                    age_min=age_min, age_max=age_max, sex=sex)
+                    age_min=age_min, age_max=age_max, sex=sex, city_title=city_title)
         await user.create()
     except UniqueViolationError:
         print('Пользователь не добавлен')
 
-async def upd_user(user_id: int,
-                   first_name: str,
-                   last_name: str,
-                   city: int,
-                   age: int,
-                   age_min: int,
-                   age_max: int,
-                   sex: int):
-    user = await User.query.where(User.user_id == user_id).gino.first()
-    user.first_name = first_name
-    user.update(first_name=first_name)
-    return 'updated'
+async def upd_user(
+    user_id: int,
+    first_name: str,
+    last_name: str,
+    city: int,
+    age: int,
+    age_min: int,
+    age_max: int,
+    sex: int,
+    city_title: str
+    ):
+
+    updated_user = await User.query.where(User.user_id == user_id).gino.first()
+    await updated_user.update(first_name=first_name,
+                              last_name=last_name,
+                              city=city, age=age,
+                              age_min=age_min,
+                              age_max=age_max,
+                              sex=sex,
+                              city_title=city_title).apply()
+
+    return updated_user
 
 async def select_user(user_id):
     user = await User.query.where(User.user_id == user_id).gino.first()
@@ -51,6 +62,7 @@ async def select_user(user_id):
         info['sex'] = user.sex
         info['city'] = user.city
         info['id'] = user.user_id
+        info['city_title'] = user.city_title
         return info
 
 
@@ -68,13 +80,9 @@ async def list_favorites(user_id):
     return favorites_list
 
 
-async def delete_favorites(user_id):
-    """
-    Функция принимает user_id и удаляет избранного пользователя
-    """
+async def delete_favorite(user_id, fav_id):
 
-    favorite = await Favorite_person.query.where(Favorite_person.user_id == user_id).gino.all()
-    await favorite.delete()
+    await Favorites.delete.where(Favorites.favorite_id == fav_id).gino.first()
 
 
 async def add_offer(user_id, offered_id):
