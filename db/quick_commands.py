@@ -1,9 +1,6 @@
 from asyncpg import UniqueViolationError
-from pprint import pprint
-
 from db.dp_gino import db
 from db.schemas.user import User, Favorites, Offer, Black_list
-
 
 
 async def add_user(
@@ -25,6 +22,7 @@ async def add_user(
     except UniqueViolationError:
         print('Пользователь не добавлен')
 
+
 async def upd_user(
     user_id: int,
     first_name: str,
@@ -34,9 +32,7 @@ async def upd_user(
     age_min: int,
     age_max: int,
     sex: int,
-    city_title: str
-    ):
-
+    city_title: str):
     updated_user = await User.query.where(User.user_id == user_id).gino.first()
     await updated_user.update(first_name=first_name,
                               last_name=last_name,
@@ -45,6 +41,8 @@ async def upd_user(
                               age_max=age_max,
                               sex=sex,
                               city_title=city_title).apply()
+
+
 async def add_fav(user_id: int, fav_id: int):
     try:
         favorite = Favorites(user_id=user_id, favorite_id=fav_id)
@@ -52,11 +50,10 @@ async def add_fav(user_id: int, fav_id: int):
     except UniqueViolationError:
         print("Пользователь не добавлен")
 
-    return updated_user
 
 async def select_user(user_id):
     user = await User.query.where(User.user_id == user_id).gino.first()
-    if user == None:
+    if user is None:
         return None
     else:
         info = {}
@@ -87,7 +84,6 @@ async def list_favorites(user_id):
 
 
 async def delete_favorite(user_id, fav_id):
-
     await Favorites.delete.where(Favorites.favorite_id == fav_id).gino.first()
 
 
@@ -106,10 +102,12 @@ async def offers(user_id):
         offer_list.append(i.offer_id)
     return offer_list
 
+
 async def add_bl(user_id, reason, status):
     block = Black_list(user_id=user_id, reason=reason, status=status)
     await block.create()
     return 'added'
+
 
 async def chk_bl(user_id):
     user = await db.scalar(db.exists().where(Black_list.user_id == user_id).select())

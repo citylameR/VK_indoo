@@ -1,1 +1,1 @@
-from vk import vk, search_function, getcityindex
+from vk import user_info, search_function, getcityindex, take_photo

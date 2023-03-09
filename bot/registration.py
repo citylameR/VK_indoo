@@ -13,42 +13,51 @@ class Registration:
         self.botfunc.write_msg_wk(
             self.id, f'Вас зовут {self.info["first_name"]}?', keys.register_keys
         )
-        req = self.botfunc.listen()
+        req_name = None
         while True:
-            if req == "Поменять":
+            if req_name == "Поменять":
                 self.botfunc.write_msg(self.id, "Как Вас зовут?")
                 return self.botfunc.listen()
-            elif req == "Да!":
+            elif req_name == "Да!":
                 return self.info["first_name"]
-            self.botfunc.write_msg_wk(
-                self.id,
-                "Я вас не понимаю :(\nДавайте попробуем ещё раз!",
-                keys.register_keys,
-            )
-            req = self.botfunc.listen()
+            else:
+                if req_name:
+                    self.botfunc.write_msg_wk(
+                        self.id,
+                        "Я вас не понимаю :(\nДавайте попробуем ещё раз!",
+                        keys.register_keys)
+                req_name = self.botfunc.listen()
 
     def getcity(self):
         self.botfunc.write_msg_wk(
-            self.id, f'Ваш город {self.info["city_title"]}?', keys.register_keys
-        )
+            self.id, f'Ваш город {self.info["city_title"]}?', keys.register_keys)
         req = self.botfunc.listen()
         while True:
             if req == "Поменять":
                 self.botfunc.write_msg(self.id, "В каком городе будем искать?")
                 city = vk.getcityindex.get_city_index(self.botfunc.listen())
-                self.botfunc.write_msg(self.id, f'Установлен город {city["title"]}!')
-                return city
+                if city is not None:
+                    self.botfunc.write_msg(self.id, f'Установлен город {city["title"]}!')
+                    return city
+                else:
+                    self.botfunc.write_msg(self.id, "Я не нашёл такого города :(\nПопробуйте ввести город на русском "
+                                                    "языке максимально точно")
+                    self.botfunc.write_msg_wk(
+                        self.id, f'Ваш город {self.info["city_title"]}?', keys.register_keys)
+                    req = None
             elif req == "Да!":
-                return self.info["city"]
-            self.botfunc.write_msg_wk(
-                self.id,
-                "Я вас не понимаю :(\nДавайте попробуем ещё раз!",
-                keys.register_keys,
-            )
+                city = {"id": self.info["city"], "title": self.info["city_title"]}
+                return city
+            else:
+                if req is not None:
+                    self.botfunc.write_msg_wk(self.id,
+                    "Я вас не понимаю :(\nДавайте попробуем ещё раз!",
+                    keys.register_keys)
             req = self.botfunc.listen()
 
+
     def getage(self):
-        if self.info["age"] == None:
+        if self.info["age"] is None:
             self.botfunc.write_msg(
                 self.id, "Мне не увидеть дату рождения :(\nСколько тебе лет?"
             )
@@ -100,12 +109,12 @@ class Registration:
                 return 2
             elif req == "Девушек":
                 return 1
-        self.botfunc.write_msg_wk(
-            self.id,
-            "Я вас не понимаю :(\nДавайте попробуем ещё раз!",
-            keys.keyboard_sex,
-        )
-        req = self.botfunc.listen()
+            else:
+                self.botfunc.write_msg_wk(
+                    self.id,
+                    "Я вас не понимаю :(\nДавайте попробуем ещё раз!",
+                    keys.keyboard_sex)
+                req = self.botfunc.listen()
 
     def getage_min(self):
         self.botfunc.write_msg(self.id, "Введите минимальный возраст для поиска:")
@@ -122,12 +131,10 @@ class Registration:
                 self.botfunc.write_msg(self.id, "Я Вас не понимаю :(\nПопробуйте ещё раз!")
             min_age = self.botfunc.listen()
             check = bot.age_check.chk_min(min_age)
-        return min_age
 
     def getage_max(self, age_min):
         self.botfunc.write_msg(
-            self.id, "Теперь введите максимальный возраст для поиска:"
-        )
+            self.id, "Теперь введите максимальный возраст для поиска:")
         check = ''
         while True:
             if check == 'pass':
@@ -140,4 +147,3 @@ class Registration:
                 self.botfunc.write_msg(self.id, "Я Вас не понимаю :(\nПопробуйте ещё раз!")
             max_age = self.botfunc.listen()
             check = bot.age_check.chk_max(age_min, max_age)
-        return max_age
