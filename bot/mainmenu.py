@@ -11,9 +11,8 @@ def mainmenu(user_id, vk_bot, info):
         bot.new_user.new_user(user_id, botfunc, vk_bot)
         loop = asyncio.get_event_loop()
         info = loop.run_until_complete(quick_commands.select_user(user_id))
-        pprint(info)
     botfunc.write_msg_wk(user_id, f'Добро пожаловать, {info["first_name"]}', keys.menu_keys)
-
+    req = ''
     while True:
         req = botfunc.listen()
         if req == "Начать поиск":
@@ -26,4 +25,6 @@ def mainmenu(user_id, vk_bot, info):
             bot.profile.show(info, vk_bot)
             req == ''
         else:
-            botfunc.write_msg_wk(user_id, "Выберите действие:", keys.menu_keys)
+            if req != '':
+                botfunc.write_msg_wk(user_id, "Выберите действие:", keys.menu_keys)
+                req = botfunc.listen()

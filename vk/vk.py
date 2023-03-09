@@ -80,7 +80,8 @@ def take_user_info(user_id):
         "first_name": data_id_info["first_name"],
         "last_name": data_id_info["last_name"],
         "sex": data_id_info["sex"],
-        "city": data_id_info["city"],
+        "city": data_id_info["city"]["id"],
+        "city_title": data_id_info["city"]["title"],
         "age": None,
     }
     if "bdate" in data_id_info:

@@ -2,6 +2,7 @@ import bot.keyboards as keys
 import bot
 from db import quick_commands
 import asyncio
+from pprint import pprint
 
 def rewrite(info):
     loop = asyncio.get_event_loop()
@@ -37,7 +38,10 @@ def show(info, vk_bot):
             mess = ''
 
         elif mess == 'Город':
-            info["city"] = change.getcity()
+            pprint (info)
+            city = change.getcity()
+            info["city"] = city["id"]
+            info["city_title"] = city["title"]
             rewrite(info)
             mess = ''
 

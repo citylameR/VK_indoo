@@ -29,7 +29,7 @@ class Registration:
 
     def getcity(self):
         self.botfunc.write_msg_wk(
-            self.id, f'Ваш город {self.info["city"]["title"]}?', keys.register_keys
+            self.id, f'Ваш город {self.info["city_title"]}?', keys.register_keys
         )
         req = self.botfunc.listen()
         while True:

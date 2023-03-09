@@ -25,4 +25,5 @@ if __name__ == "__main__":
                     info = loop.run_until_complete(
                         quick_commands.select_user(event.user_id)
                     )
+                    pprint(info)
                     bot.mainmenu.mainmenu(event.user_id, vk_bot, info)
