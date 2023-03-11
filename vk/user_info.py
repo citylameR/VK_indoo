@@ -1,5 +1,5 @@
 import requests
-from tokens import token_vk
+from data.config import token_vk
 import datetime
 
 
