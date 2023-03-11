@@ -18,13 +18,18 @@ def take_user_info(user_id):
         "first_name": data_id_info["first_name"],
         "last_name": data_id_info["last_name"],
         "sex": data_id_info["sex"],
-        "city": data_id_info["city"]["id"],
-        "city_title": data_id_info["city"]["title"],
+        "city": 1,
+        "city_title": "Москва",
         "age": None
     }
     if "bdate" in data_id_info:
-        delta = datetime.datetime.today() - datetime.datetime.strptime(
-            data_id_info["bdate"], "%d.%m.%Y"
-        )
-        info["age"] = delta.days // 365
+        try:
+            delta = datetime.datetime.today() - datetime.datetime.strptime(
+                data_id_info["bdate"], "%d.%m.%Y")
+            info["age"] = delta.days // 365
+        except:
+            info["age"] = None
+    if "city" in data_id_info:
+        info["city"] = data_id_info["city"]["id"]
+        info["city_title"] = data_id_info["city"]["title"]
     return info
